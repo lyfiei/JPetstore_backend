@@ -1,19 +1,18 @@
 package com.csu.model.Enum;
 
 /**
- * 订单状态枚举类
- * 定义订单的所有可能状态及其对应的代码和描述
+ * 商品状态枚举类
+ * 定义商品（SKU）的所有可能状态
  */
-public enum OrderStatusEnum {
-    PENDING("P", "待处理"),
-    APPROVED("A", "已批准"),
-    REJECTED("R", "已拒绝"),
-    SHIPPED("S", "已发货");
+public enum ItemStatusEnum {
+    AVAILABLE("P", "可售"),
+    OUT_OF_STOCK("O", "缺货"),
+    DISCONTINUED("D", "已下架");
 
     private final String code;
     private final String description;
 
-    OrderStatusEnum(String code, String description) {
+    ItemStatusEnum(String code, String description) {
         this.code = code;
         this.description = description;
     }
@@ -38,12 +37,12 @@ public enum OrderStatusEnum {
      * @return 对应的枚举值
      * @throws IllegalArgumentException 如果代码不存在
      */
-    public static OrderStatusEnum fromCode(String code) {
-        for (OrderStatusEnum status : values()) {
+    public static ItemStatusEnum fromCode(String code) {
+        for (ItemStatusEnum status : values()) {
             if (status.getCode().equals(code)) {
                 return status;
             }
         }
-        throw new IllegalArgumentException("Unknown order status code: " + code);
+        throw new IllegalArgumentException("Unknown item status code: " + code);
     }
 }

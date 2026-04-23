@@ -3,6 +3,10 @@ package com.csu.model.VO;
 import lombok.Data;
 import java.math.BigDecimal;
 
+/**
+ * 购物车项视图对象（VO）
+ * 用于向前端展示购物车中单个商品的详细信息
+ */
 @Data
 public class CartItemVO {
     private ItemVO item;

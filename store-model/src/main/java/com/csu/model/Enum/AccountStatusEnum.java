@@ -1,19 +1,20 @@
 package com.csu.model.Enum;
 
 /**
- * 订单状态枚举类
- * 定义订单的所有可能状态及其对应的代码和描述
+ * 账户状态枚举类
+ * 定义用户账户的所有可能状态
  */
-public enum OrderStatusEnum {
-    PENDING("P", "待处理"),
-    APPROVED("A", "已批准"),
-    REJECTED("R", "已拒绝"),
-    SHIPPED("S", "已发货");
+public enum AccountStatusEnum {
+    /** 正常状态 */
+    ACTIVE("OK", "正常"),
+    
+    /** 禁用状态 */
+    INACTIVE("OFF", "禁用");
 
     private final String code;
     private final String description;
 
-    OrderStatusEnum(String code, String description) {
+    AccountStatusEnum(String code, String description) {
         this.code = code;
         this.description = description;
     }
@@ -38,12 +39,12 @@ public enum OrderStatusEnum {
      * @return 对应的枚举值
      * @throws IllegalArgumentException 如果代码不存在
      */
-    public static OrderStatusEnum fromCode(String code) {
-        for (OrderStatusEnum status : values()) {
+    public static AccountStatusEnum fromCode(String code) {
+        for (AccountStatusEnum status : values()) {
             if (status.getCode().equals(code)) {
                 return status;
             }
         }
-        throw new IllegalArgumentException("Unknown order status code: " + code);
+        throw new IllegalArgumentException("Unknown account status code: " + code);
     }
 }
