@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csu.dao.mapper.SignOnMapper">
+
+    <select id="selectByUsername" resultType="com.csu.model.Entity.SignOn">
+        SELECT * FROM signon WHERE username = #{username}
+    </select>
+
+    <select id="validateLogin" resultType="com.csu.model.Entity.SignOn">
+        SELECT * FROM signon WHERE username = #{username} AND password = #{password}
+    </select>
+
+    <update id="updatePassword">
+        UPDATE signon SET password = #{password} WHERE username = #{username}
+    </update>
+
+</mapper>

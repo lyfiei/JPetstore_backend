@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csu.dao.mapper.CategoryMapper">
+
+    <select id="selectAllCategories" resultType="com.csu.model.Entity.Category">
+        SELECT * FROM category ORDER BY catid
+    </select>
+
+    <select id="searchByName" resultType="com.csu.model.Entity.Category">
+        SELECT * FROM category
+        WHERE LOWER(name) LIKE LOWER(CONCAT('%', #{name}, '%'))
+        ORDER BY catid
+    </select>
+
+    <select id="countByCategoryId" resultType="int">
+        SELECT COUNT(*) FROM category WHERE catid = #{categoryId}
+    </select>
+
+</mapper>

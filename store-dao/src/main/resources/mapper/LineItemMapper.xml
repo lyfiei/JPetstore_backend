@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csu.dao.mapper.LineItemMapper">
+
+    <resultMap id="topSellingMap" type="java.util.HashMap">
+        <result property="itemId" column="itemid"/>
+        <result property="totalQuantity" column="total_quantity"/>
+        <result property="orderCount" column="order_count"/>
+    </resultMap>
+
+    <select id="selectByOrderId" resultType="com.csu.model.Entity.LineItem">
+        SELECT * FROM lineitem WHERE orderid = #{orderId} ORDER BY linenum
+    </select>
+
+    <insert id="batchInsertLineItems">
+        INSERT INTO lineitem (orderid, linenum, quantity, itemid, unitprice) VALUES
+        <foreach collection="lineItems" item="item" separator=",">
+            (#{item.orderId}, #{item.lineNumber}, #{item.quantity}, #{item.itemId}, #{item.unitPrice})
+        </foreach>
+    </insert>
+
+    <select id="selectByItemId" resultType="com.csu.model.Entity.LineItem">
+        SELECT * FROM lineitem WHERE itemid = #{itemId} ORDER BY orderid
+    </select>
+
+    <select id="sumQuantityByItemId" resultType="int">
+        SELECT COALESCE(SUM(quantity), 0) FROM lineitem WHERE itemid = #{itemId}
+    </select>
+
+    <select id="selectTopSellingItems" resultMap="topSellingMap">
+        SELECT itemid,
+               SUM(quantity) as total_quantity,
+               COUNT(DISTINCT orderid) as order_count
+        FROM lineitem
+        GROUP BY itemid
+        ORDER BY total_quantity DESC
+            LIMIT #{limit}
+    </select>
+
+</mapper>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csu.dao.mapper.ProfileMapper">
+
+    <select id="selectByUserId" resultType="com.csu.model.Entity.Profile">
+        SELECT * FROM profile WHERE userid = #{userId}
+    </select>
+
+    <insert id="insertOrUpdateProfile">
+        INSERT INTO profile (userid, favcategory, langpref, mylistopt, banneropt)
+        VALUES (#{profile.userId}, #{profile.favouriteCategoryId}, #{profile.languagePreference},
+                #{profile.listOption}, #{profile.bannerOption})
+            ON DUPLICATE KEY UPDATE
+                                 favcategory = #{profile.favouriteCategoryId},
+                                 langpref = #{profile.languagePreference},
+                                 mylistopt = #{profile.listOption},
+                                 banneropt = #{profile.bannerOption}
+    </insert>
+
+</mapper>

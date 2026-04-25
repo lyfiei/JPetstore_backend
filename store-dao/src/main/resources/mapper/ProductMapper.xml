@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csu.dao.mapper.ProductMapper">
+
+    <resultMap id="productWithCategoryMap" type="com.csu.model.Entity.Product">
+        <id property="productId" column="productid"/>
+        <result property="categoryId" column="category"/>
+        <result property="name" column="name"/>
+        <result property="description" column="descn"/>
+    </resultMap>
+
+    <select id="selectByCategoryId" resultType="com.csu.model.Entity.Product">
+        SELECT * FROM product WHERE category = #{categoryId} ORDER BY productid
+    </select>
+
+    <select id="searchByName" resultType="com.csu.model.Entity.Product">
+        SELECT * FROM product
+        WHERE LOWER(name) LIKE LOWER(CONCAT('%', #{name}, '%'))
+        ORDER BY productid
+    </select>
+
+    <select id="countByCategoryId" resultType="int">
+        SELECT COUNT(*) FROM product WHERE category = #{categoryId}
+    </select>
+
+    <select id="countByProductId" resultType="int">
+        SELECT COUNT(*) FROM product WHERE productid = #{productId}
+    </select>
+
+    <select id="selectWithCategoryName" resultMap="productWithCategoryMap">
+        SELECT p.*, c.name as category_name
+        FROM product p
+        LEFT JOIN category c ON p.category = c.catid
+        <where>
+            <if test="categoryId != null and categoryId != ''">
+                AND p.category = #{categoryId}
+            </if>
+        </where>
+        ORDER BY p.productid
+    </select>
+
+</mapper>

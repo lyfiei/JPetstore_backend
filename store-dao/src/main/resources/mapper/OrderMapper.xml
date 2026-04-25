@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csu.dao.mapper.OrderMapper">
+
+    <resultMap id="orderResultMap" type="com.csu.model.Entity.Order">
+        <id property="orderId" column="orderid"/>
+        <result property="userId" column="userid"/>
+        <result property="orderDate" column="orderdate"/>
+        <result property="shipAddress1" column="shipaddr1"/>
+        <result property="shipAddress2" column="shipaddr2"/>
+        <result property="shipCity" column="shipcity"/>
+        <result property="shipState" column="shipstate"/>
+        <result property="shipZip" column="shipzip"/>
+        <result property="shipCountry" column="shipcountry"/>
+        <result property="billAddress1" column="billaddr1"/>
+        <result property="billAddress2" column="billaddr2"/>
+        <result property="billCity" column="billcity"/>
+        <result property="billState" column="billstate"/>
+        <result property="billZip" column="billzip"/>
+        <result property="billCountry" column="billcountry"/>
+        <result property="courier" column="courier"/>
+        <result property="totalPrice" column="totalprice"/>
+        <result property="billToFirstName" column="billtofirstname"/>
+        <result property="billToLastName" column="billtolastname"/>
+        <result property="shipToFirstName" column="shiptofirstname"/>
+        <result property="shipToLastName" column="shiptolastname"/>
+        <result property="creditCard" column="creditcard"/>
+        <result property="expiryDate" column="exprdate"/>
+        <result property="cardType" column="cardtype"/>
+        <result property="locale" column="locale"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <resultMap id="statisticsMap" type="java.util.HashMap">
+        <result property="totalOrders" column="total_orders"/>
+        <result property="pendingOrders" column="pending_orders"/>
+        <result property="approvedOrders" column="approved_orders"/>
+        <result property="rejectedOrders" column="rejected_orders"/>
+        <result property="shippedOrders" column="shipped_orders"/>
+        <result property="totalRevenue" column="total_revenue"/>
+    </resultMap>
+
+    <select id="selectByUserId" resultMap="orderResultMap">
+        SELECT o.*, os.status
+        FROM orders o
+                 LEFT JOIN (
+            SELECT orderid, status
+            FROM orderstatus
+            WHERE (orderid, linenum) IN (
+                SELECT orderid, MAX(linenum)
+                FROM orderstatus
+                GROUP BY orderid
+            )
+        ) os ON o.orderid = os.orderid
+        WHERE o.userid = #{userId}
+        ORDER BY o.orderdate DESC
+    </select>
+
+    <select id="selectWithDetails" resultMap="orderResultMap">
+        SELECT o.*, os.status
+        FROM orders o
+                 LEFT JOIN (
+            SELECT orderid, status
+            FROM orderstatus
+            WHERE (orderid, linenum) IN (
+                SELECT orderid, MAX(linenum)
+                FROM orderstatus
+                GROUP BY orderid
+            )
+        ) os ON o.orderid = os.orderid
+        WHERE o.orderid = #{orderId}
+    </select>
+
+    <select id="selectOrdersByCondition" resultMap="orderResultMap">
+        SELECT o.*, os.status
+        FROM orders o
+        LEFT JOIN (
+        SELECT orderid, status
+        FROM orderstatus
+        WHERE (orderid, linenum) IN (
+        SELECT orderid, MAX(linenum)
+        FROM orderstatus
+        GROUP BY orderid
+        )
+        ) os ON o.orderid = os.orderid
+        <where>
+            <if test="orderId != null">
+                AND o.orderid = #{orderId}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND o.userid = #{userId}
+            </if>
+            <if test="status != null and status != ''">
+                AND os.status = #{status}
+            </if>
+            <if test="startDate != null">
+                AND o.orderdate &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND o.orderdate &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY o.orderdate DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countOrdersByCondition" resultType="int">
+        SELECT COUNT(DISTINCT o.orderid)
+        FROM orders o
+        LEFT JOIN (
+        SELECT orderid, status
+        FROM orderstatus
+        WHERE (orderid, linenum) IN (
+        SELECT orderid, MAX(linenum)
+        FROM orderstatus
+        GROUP BY orderid
+        )
+        ) os ON o.orderid = os.orderid
+        <where>
+            <if test="orderId != null">
+                AND o.orderid = #{orderId}
+            </if>
+            <if test="userId != null and userId != ''">
+                AND o.userid = #{userId}
+            </if>
+            <if test="status != null and status != ''">
+                AND os.status = #{status}
+            </if>
+            <if test="startDate != null">
+                AND o.orderdate &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND o.orderdate &lt;= #{endDate}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectTodayOrders" resultMap="orderResultMap">
+        SELECT o.*, os.status
+        FROM orders o
+                 LEFT JOIN (
+            SELECT orderid, status
+            FROM orderstatus
+            WHERE (orderid, linenum) IN (
+                SELECT orderid, MAX(linenum)
+                FROM orderstatus
+                GROUP BY orderid
+            )
+        ) os ON o.orderid = os.orderid
+        WHERE DATE(o.orderdate) = CURDATE()
+        ORDER BY o.orderdate DESC
+    </select>
+
+    <select id="selectPendingOrders" resultMap="orderResultMap">
+        SELECT o.*, os.status
+        FROM orders o
+                 INNER JOIN (
+            SELECT orderid, status
+            FROM orderstatus
+            WHERE (orderid, linenum) IN (
+                SELECT orderid, MAX(linenum)
+                FROM orderstatus
+                GROUP BY orderid
+            )
+        ) os ON o.orderid = os.orderid
+        WHERE os.status = 'P'
+        ORDER BY o.orderdate ASC
+    </select>
+
+    <update id="updateCourier">
+        UPDATE orders SET courier = #{courier} WHERE orderid = #{orderId}
+    </update>
+
+    <update id="updateOrderStatus">
+        UPDATE orders SET status = #{status} WHERE orderid = #{orderId}
+    </update>
+
+    <delete id="deleteOrder">
+        DELETE FROM orders WHERE orderid = #{orderId}
+    </delete>
+
+    <select id="sumTotalPriceByStatus" resultType="java.math.BigDecimal">
+        SELECT COALESCE(SUM(o.totalprice), 0)
+        FROM orders o
+                 INNER JOIN (
+            SELECT orderid, status
+            FROM orderstatus
+            WHERE (orderid, linenum) IN (
+                SELECT orderid, MAX(linenum)
+                FROM orderstatus
+                GROUP BY orderid
+            )
+        ) os ON o.orderid = os.orderid
+        WHERE os.status = #{status}
+    </select>
+
+    <select id="countOrdersByStatus" resultType="int">
+        SELECT COUNT(*)
+        FROM orders o
+                 INNER JOIN (
+            SELECT orderid, status
+            FROM orderstatus
+            WHERE (orderid, linenum) IN (
+                SELECT orderid, MAX(linenum)
+                FROM orderstatus
+                GROUP BY orderid
+            )
+        ) os ON o.orderid = os.orderid
+        WHERE os.status = #{status}
+    </select>
+
+    <select id="selectOrderStatistics" resultMap="statisticsMap">
+        SELECT
+            COUNT(*) as total_orders,
+            SUM(CASE WHEN os.status = 'P' THEN 1 ELSE 0 END) as pending_orders,
+            SUM(CASE WHEN os.status = 'A' THEN 1 ELSE 0 END) as approved_orders,
+            SUM(CASE WHEN os.status = 'R' THEN 1 ELSE 0 END) as rejected_orders,
+            SUM(CASE WHEN os.status = 'S' THEN 1 ELSE 0 END) as shipped_orders,
+            COALESCE(SUM(o.totalprice), 0) as total_revenue
+        FROM orders o
+                 INNER JOIN (
+            SELECT orderid, status
+            FROM orderstatus
+            WHERE (orderid, linenum) IN (
+                SELECT orderid, MAX(linenum)
+                FROM orderstatus
+                GROUP BY orderid
+            )
+        ) os ON o.orderid = os.orderid
+    </select>
+
+</mapper>

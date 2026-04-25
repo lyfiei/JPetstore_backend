@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csu.dao.mapper.OrderStatusMapper">
+
+    <select id="selectByOrderId" resultType="com.csu.model.Entity.OrderStatus">
+        SELECT * FROM orderstatus WHERE orderid = #{orderId} ORDER BY linenum
+    </select>
+
+    <insert id="insertOrderStatus">
+        INSERT INTO orderstatus (orderid, linenum, timestamp, status)
+        VALUES (
+                   #{orderStatus.orderId},
+                   (SELECT IFNULL(MAX(linenum), 0) + 1 FROM orderstatus WHERE orderid = #{orderStatus.orderId}),
+                   #{orderStatus.timestamp},
+                   #{orderStatus.status}
+               )
+    </insert>
+
+    <insert id="batchInsertOrderStatus">
+        INSERT INTO orderstatus (orderid, linenum, timestamp, status) VALUES
+        <foreach collection="orderStatusList" item="status" separator=",">
+            (#{status.orderId}, #{status.lineNumber}, #{status.timestamp}, #{status.status})
+        </foreach>
+    </insert>
+
+    <select id="selectLatestStatus" resultType="com.csu.model.Entity.OrderStatus">
+        SELECT * FROM orderstatus
+        WHERE orderid = #{orderId}
+        ORDER BY linenum DESC
+            LIMIT 1
+    </select>
+
+    <select id="selectOrderIdsByStatus" resultType="int">
+        SELECT DISTINCT orderid
+        FROM orderstatus
+        WHERE status = #{status}
+        ORDER BY orderid
+    </select>
+
+    <select id="countStatusChanges" resultType="int">
+        SELECT COUNT(*) FROM orderstatus
+        WHERE timestamp &gt;= #{startDate} AND timestamp &lt;= #{endDate}
+    </select>
+
+</mapper>

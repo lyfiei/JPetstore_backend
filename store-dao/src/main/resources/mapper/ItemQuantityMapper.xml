@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.csu.dao.mapper.ItemQuantityMapper">
+
+    <resultMap id="lowStockItemMap" type="java.util.HashMap">
+        <result property="itemId" column="itemid"/>
+        <result property="quantity" column="qty"/>
+    </resultMap>
+
+    <select id="selectByItemId" resultType="com.csu.model.Entity.ItemQuantity">
+        SELECT * FROM inventory WHERE itemid = #{itemId}
+    </select>
+
+    <update id="updateQuantity">
+        UPDATE inventory SET qty = #{quantity} WHERE itemid = #{itemId}
+    </update>
+
+    <update id="increaseQuantity">
+        UPDATE inventory SET qty = qty + #{amount} WHERE itemid = #{itemId}
+    </update>
+
+    <update id="decreaseQuantity">
+        UPDATE inventory SET qty = qty - #{amount} WHERE itemid = #{itemId} AND qty >= #{amount}
+    </update>
+
+    <select id="selectByItemIds" resultType="com.csu.model.Entity.ItemQuantity">
+        SELECT * FROM inventory
+        WHERE itemid IN
+        <foreach collection="itemIds" item="itemId" open="(" separator="," close=")">
+            #{itemId}
+        </foreach>
+    </select>
+
+    <select id="selectLowStockItems" resultMap="lowStockItemMap">
+        SELECT itemid, qty FROM inventory WHERE qty &lt; #{threshold} ORDER BY qty ASC
+    </select>
+
+    <select id="checkStockSufficient" resultType="int">
+        SELECT COUNT(*) FROM inventory WHERE itemid = #{itemId} AND qty >= #{requiredQuantity}
+    </select>
+
+</mapper>
