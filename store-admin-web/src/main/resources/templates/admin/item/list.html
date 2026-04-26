@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>货品管理 - JPetStore 管理后台</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="card">
+        <div class="card-header">
+            <span>货品管理</span>
+            <a th:href="@{/admin/items/new}" class="btn btn-success" style="float: right;">+ 新增货品</a>
+        </div>
+        
+        <form th:action="@{/admin/items}" method="get" class="search-form">
+            <input type="text" name="keyword" th:value="${keyword}" placeholder="搜索货品ID...">
+            <select name="productId">
+                <option value="">全部商品</option>
+                <option th:each="prod : ${products}" 
+                        th:value="${prod.productId}" 
+                        th:text="${prod.name}"
+                        th:selected="${productId == prod.productId}">-</option>
+            </select>
+            <button type="submit" class="btn btn-primary">搜索</button>
+            <a th:href="@{/admin/items}" class="btn btn-warning">重置</a>
+        </form>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>货品ID</th>
+                    <th>所属商品</th>
+                    <th>列表价格</th>
+                    <th>成本价</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${itemPage.records}">
+                    <td th:text="${item.itemId}">-</td>
+                    <td th:text="${item.productId}">-</td>
+                    <td th:text="'¥' + ${item.listPrice}">-</td>
+                    <td th:text="'¥' + ${item.unitCost}">-</td>
+                    <td>
+                        <span class="badge badge-success" th:if="${item.status == 'P'}">有货</span>
+                        <span class="badge badge-danger" th:if="${item.status != 'P'}">缺货</span>
+                    </td>
+                    <td>
+                        <a th:href="@{'/admin/items/' + ${item.itemId}}" class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">详情</a>
+                        <a th:href="@{'/admin/items/' + ${item.itemId} + '/edit'}" class="btn btn-warning" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">编辑</a>
+                        <button class="btn btn-danger delete-item-btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
+                                th:data-id="${item.itemId}">删除</button>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(itemPage.records)}">
+                    <td colspan="6" style="text-align: center; padding: 2rem;">暂无数据</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="pagination" th:if="${itemPage.pages > 0}">
+            <a th:if="${itemPage.current > 1}" th:href="@{/admin/items(pageNum=${itemPage.current - 1}, pageSize=${itemPage.size}, keyword=${keyword}, productId=${productId})}">上一页</a>
+            <span th:each="i : ${#numbers.sequence(1, itemPage.pages)}" 
+                  th:classappend="${i == itemPage.current} ? 'active'"
+                  th:if="${itemPage.pages <= 10 or i == 1 or i == itemPage.pages or (i >= itemPage.current - 2 and i <= itemPage.current + 2)}"
+                  th:href="@{/admin/items(pageNum=${i}, pageSize=${itemPage.size}, keyword=${keyword}, productId=${productId})}"
+                  th:text="${i}">1</span>
+            <a th:if="${itemPage.current < itemPage.pages}" th:href="@{/admin/items(pageNum=${itemPage.current + 1}, pageSize=${itemPage.size}, keyword=${keyword}, productId=${productId})}">下一页</a>
+        </div>
+    </div>
+    
+    <script>
+        document.querySelectorAll('.delete-item-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (confirm('确定要删除这个货品吗？')) {
+                    const id = this.getAttribute('data-id');
+                    fetch(`/admin/items/${id}`, {
+                        method: 'DELETE'
+                    }).then(response => response.json())
+                      .then(result => {
+                          if (result.code === 200) {
+                              alert('删除成功');
+                              location.reload();
+                          } else {
+                              alert('删除失败：' + result.message);
+                          }
+                      });
+                }
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

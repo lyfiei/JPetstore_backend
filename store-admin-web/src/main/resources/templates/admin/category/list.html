@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>分类管理 - JPetStore 管理后台</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="card">
+        <div class="card-header">
+            <span>分类管理</span>
+            <a th:href="@{/admin/categories/new}" class="btn btn-success" style="float: right;">+ 新增分类</a>
+        </div>
+        
+        <form th:action="@{/admin/categories}" method="get" class="search-form">
+            <input type="text" name="keyword" th:value="${keyword}" placeholder="搜索分类名称或描述...">
+            <button type="submit" class="btn btn-primary">搜索</button>
+            <a th:href="@{/admin/categories}" class="btn btn-warning">重置</a>
+        </form>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>分类ID</th>
+                    <th>分类名称</th>
+                    <th>描述</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="category : ${categoryPage.records}">
+                    <td th:text="${category.categoryId}">-</td>
+                    <td th:text="${category.name}">-</td>
+                    <td th:text="${category.description}">-</td>
+                    <td>
+                        <a th:href="@{'/admin/categories/' + ${category.categoryId}}" class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">详情</a>
+                        <a th:href="@{'/admin/categories/' + ${category.categoryId} + '/edit'}" class="btn btn-warning" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">编辑</a>
+                        <button class="btn btn-danger delete-btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
+                                th:data-id="${category.categoryId}">删除</button>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(categoryPage.records)}">
+                    <td colspan="4" style="text-align: center; padding: 2rem;">暂无数据</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="pagination" th:if="${categoryPage.pages > 0}">
+            <a th:if="${categoryPage.current > 1}" th:href="@{/admin/categories(pageNum=${categoryPage.current - 1}, pageSize=${categoryPage.size}, keyword=${keyword})}">上一页</a>
+            <span th:each="i : ${#numbers.sequence(1, categoryPage.pages)}" 
+                  th:classappend="${i == categoryPage.current} ? 'active'"
+                  th:if="${categoryPage.pages <= 10 or i == 1 or i == categoryPage.pages or (i >= categoryPage.current - 2 and i <= categoryPage.current + 2)}"
+                  th:href="@{/admin/categories(pageNum=${i}, pageSize=${categoryPage.size}, keyword=${keyword})}"
+                  th:text="${i}">1</span>
+            <a th:if="${categoryPage.current < categoryPage.pages}" th:href="@{/admin/categories(pageNum=${categoryPage.current + 1}, pageSize=${categoryPage.size}, keyword=${keyword})}">下一页</a>
+        </div>
+    </div>
+    
+    <script>
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (confirm('确定要删除这个分类吗？')) {
+                    const id = this.getAttribute('data-id');
+                    fetch(`/admin/categories/${id}`, {
+                        method: 'DELETE'
+                    }).then(response => response.json())
+                      .then(result => {
+                          if (result.code === 200) {
+                              alert('删除成功');
+                              location.reload();
+                          } else {
+                              alert('删除失败：' + result.message);
+                          }
+                      });
+                }
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

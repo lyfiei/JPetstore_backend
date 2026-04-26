@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>用户管理 - JPetStore 管理后台</title>
+</head>
+<body>
+<div th:fragment="content">
+    <div class="card">
+        <div class="card-header">用户管理</div>
+        
+        <form th:action="@{/admin/users}" method="get" class="search-form">
+            <input type="text" name="keyword" th:value="${keyword}" placeholder="搜索用户名、姓名或邮箱...">
+            <button type="submit" class="btn btn-primary">搜索</button>
+            <a th:href="@{/admin/users}" class="btn btn-warning">重置</a>
+        </form>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>用户名</th>
+                    <th>姓名</th>
+                    <th>邮箱</th>
+                    <th>电话</th>
+                    <th>城市</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${userPage.records}">
+                    <td th:text="${user.username}">-</td>
+                    <td th:text="${user.firstName + ' ' + user.lastName}">-</td>
+                    <td th:text="${user.email}">-</td>
+                    <td th:text="${user.phone}">-</td>
+                    <td th:text="${user.city}">-</td>
+                    <td>
+                        <span class="badge badge-success" th:if="${user.status == 'OK'}">正常</span>
+                        <span class="badge badge-danger" th:if="${user.status != 'OK'}">禁用</span>
+                    </td>
+                    <td>
+                        <a th:href="@{'/admin/users/' + ${user.username}}" class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">详情</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(userPage.records)}">
+                    <td colspan="7" style="text-align: center; padding: 2rem;">暂无数据</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="pagination" th:if="${userPage.pages > 0}">
+            <a th:if="${userPage.current > 1}" th:href="@{/admin/users(pageNum=${userPage.current - 1}, pageSize=${userPage.size}, keyword=${keyword})}">上一页</a>
+            <span th:each="i : ${#numbers.sequence(1, userPage.pages)}" 
+                  th:classappend="${i == userPage.current} ? 'active'"
+                  th:if="${userPage.pages <= 10 or i == 1 or i == userPage.pages or (i >= userPage.current - 2 and i <= userPage.current + 2)}"
+                  th:href="@{/admin/users(pageNum=${i}, pageSize=${userPage.size}, keyword=${keyword})}"
+                  th:text="${i}">1</span>
+            <a th:if="${userPage.current < userPage.pages}" th:href="@{/admin/users(pageNum=${userPage.current + 1}, pageSize=${userPage.size}, keyword=${keyword})}">下一页</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

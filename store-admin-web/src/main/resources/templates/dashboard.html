@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::content})}">
+<head>
+    <title>仪表盘 - JPetStore 管理后台</title>
+</head>
+<body>
+<div th:fragment="content">
+    <h2 style="margin-bottom: 1.5rem;">欢迎使用 JPetStore 管理后台</h2>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>总订单数</h3>
+            <div class="value" th:text="${totalOrders}">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>待处理订单</h3>
+            <div class="value" th:text="${pendingOrders}">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>今日新增</h3>
+            <div class="value">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>本月销售额</h3>
+            <div class="value">¥0</div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">快速操作</div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a th:href="@{/admin/orders}" class="btn btn-primary">查看订单</a>
+            <a th:href="@{/admin/products/new}" class="btn btn-success">添加商品</a>
+            <a th:href="@{/admin/users}" class="btn btn-warning">用户管理</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
