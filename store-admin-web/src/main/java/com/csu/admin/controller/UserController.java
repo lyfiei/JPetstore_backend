@@ -1,7 +1,7 @@
 package com.csu.admin.controller;
 
 import com.csu.common.result.Result;
-import com.csu.model.VO.AccountVO;
+import com.csu.model.vo.AccountVO;
 import com.csu.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

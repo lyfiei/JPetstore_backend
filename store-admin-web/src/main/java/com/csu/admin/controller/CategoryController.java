@@ -3,7 +3,7 @@ package com.csu.admin.controller;
 
 import com.csu.common.result.Result;
 import com.csu.model.DTO.CategoryRequestDTO;
-import com.csu.model.VO.CategoryVO;
+import com.csu.model.vo.CategoryVO;
 import com.csu.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

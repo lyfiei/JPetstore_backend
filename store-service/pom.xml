@@ -14,10 +14,23 @@
     <packaging>jar</packaging>
 
     <dependencies>
+        <!-- 依赖 model 模块 -->
+        <dependency>
+            <groupId>com.csu</groupId>
+            <artifactId>store-model</artifactId>
+        </dependency>
+
         <!-- 依赖 dao 模块 -->
         <dependency>
             <groupId>com.csu</groupId>
             <artifactId>store-dao</artifactId>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Spring Boot Starter (用于事务管理等) -->

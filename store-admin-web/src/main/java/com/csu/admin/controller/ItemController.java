@@ -3,7 +3,7 @@ package com.csu.admin.controller;
 
 import com.csu.common.result.Result;
 import com.csu.model.DTO.ItemRequestDTO;
-import com.csu.model.VO.ItemVO;
+import com.csu.model.vo.ItemVO;
 import com.csu.service.ItemService;
 import com.csu.service.ProductService;
 import lombok.RequiredArgsConstructor;

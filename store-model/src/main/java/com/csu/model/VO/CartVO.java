@@ -1,4 +1,4 @@
-package com.csu.model.VO;
+package com.csu.model.vo;
 
 import lombok.Data;
 

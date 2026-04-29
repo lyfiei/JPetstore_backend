@@ -3,7 +3,7 @@ package com.csu.admin.controller;
 
 import com.csu.common.result.Result;
 import com.csu.model.DTO.OrderStatusUpdateDTO;
-import com.csu.model.VO.OrderVO;
+import com.csu.model.vo.OrderVO;
 import com.csu.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
