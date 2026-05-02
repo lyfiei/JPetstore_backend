@@ -1,41 +1,65 @@
 
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout :: layout(~{::title}, ~{::content})}">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>仪表盘 - JPetStore 管理后台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            padding: 2rem;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+        
+        .stat-card h3 {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+    </style>
 </head>
 <body>
-<div th:fragment="content">
-    <h2 style="margin-bottom: 1.5rem;">欢迎使用 JPetStore 管理后台</h2>
-    
-    <div class="stats-grid">
+    <div class="container">
+        <h1>欢迎使用 JPetStore 管理后台</h1>
+        
         <div class="stat-card">
             <h3>总订单数</h3>
             <div class="value" th:text="${totalOrders}">0</div>
         </div>
+        
         <div class="stat-card">
             <h3>待处理订单</h3>
             <div class="value" th:text="${pendingOrders}">0</div>
         </div>
-        <div class="stat-card">
-            <h3>今日新增</h3>
-            <div class="value">0</div>
-        </div>
-        <div class="stat-card">
-            <h3>本月销售额</h3>
-            <div class="value">¥0</div>
-        </div>
     </div>
-    
-    <div class="card">
-        <div class="card-header">快速操作</div>
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-            <a th:href="@{/admin/orders}" class="btn btn-primary">查看订单</a>
-            <a th:href="@{/admin/products/new}" class="btn btn-success">添加商品</a>
-            <a th:href="@{/admin/users}" class="btn btn-warning">用户管理</a>
-        </div>
-    </div>
-</div>
 </body>
 </html>

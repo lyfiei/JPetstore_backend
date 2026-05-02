@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${isEdit} ? '编辑分类' : '新增分类'">分类表单</title>
+    <title th:text="${isEdit} ? '编辑货品' : '新增货品'">货品表单</title>
     <style>
         * {
             margin: 0;
@@ -145,52 +145,107 @@
             <ul class="sidebar-menu">
                 <li><a th:href="@{/admin/dashboard}">📊 仪表盘</a></li>
                 <li><a th:href="@{/admin/users}">👥 用户管理</a></li>
-                <li><a th:href="@{/admin/categories}" class="active">📁 分类管理</a></li>
+                <li><a th:href="@{/admin/categories}">📁 分类管理</a></li>
                 <li><a th:href="@{/admin/products}">📦 商品管理</a></li>
-                <li><a th:href="@{/admin/items}">🏷️ 货品管理</a></li>
+                <li><a th:href="@{/admin/items}" class="active">🏷️ 货品管理</a></li>
                 <li><a th:href="@{/admin/orders}">🛒 订单管理</a></li>
             </ul>
         </aside>
         
         <main class="main-content">
             <div class="card">
-                <div class="card-header" th:text="${isEdit} ? '编辑分类' : '新增分类'">分类表单</div>
+                <div class="card-header" th:text="${isEdit} ? '编辑货品' : '新增货品'">货品表单</div>
                 
-                <form id="categoryForm">
+                <form id="itemForm">
                     <div class="form-group">
-                        <label>分类ID</label>
-                        <input type="text" name="categoryId" th:value="${category?.categoryId}" 
+                        <label>货品ID</label>
+                        <input type="text" name="itemId" th:value="${item?.itemId}" 
                                th:readonly="${isEdit}" placeholder="留空则自动生成">
                     </div>
-                    
                     <div class="form-group">
-                        <label>分类名称 *</label>
-                        <input type="text" name="name" th:value="${isEdit ? category?.categoryName : category?.name}" required>
+                        <label>所属分类</label>
+                        <select id="categorySelect" name="categoryId">
+                            <option value="">请选择分类</option>
+                            <option th:each="cat : ${categories}" 
+                                    th:value="${cat.categoryId}" 
+                                    th:text="${cat.categoryName}"
+                                    th:selected="${item?.categoryId == cat.categoryId}"></option>
+                        </select>
                     </div>
-                    
                     <div class="form-group">
-                        <label>描述</label>
-                        <textarea name="description" rows="4" th:text="${category?.description}"></textarea>
+                        <label>所属商品 *</label>
+                        <select id="productSelect" name="productId" required>
+                            <option value="">请选择商品</option>
+                            <option th:each="prod : ${products}" 
+                                    th:value="${prod.productId}" 
+                                    th:text="${prod.name}"
+                                    th:selected="${item?.productId == prod.productId}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>列表价格 *</label>
+                        <input type="number" name="listPrice" th:value="${item?.listPrice}" required step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>成本价 *</label>
+                        <input type="number" name="unitCost" th:value="${item?.unitCost}" required step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select name="status">
+                            <option value="P" th:selected="${item?.status == 'P'}">有货</option>
+                            <option value="N" th:selected="${item?.status == 'N' || item == null}">缺货</option>
+                        </select>
                     </div>
                     
                     <div style="display: flex; gap: 1rem;">
                         <button type="submit" class="btn btn-primary">保存</button>
-                        <a th:href="@{/admin/categories}" class="btn btn-warning">取消</a>
+                        <a th:href="@{/admin/items}" class="btn btn-warning">取消</a>
                     </div>
                 </form>
             </div>
             
-            <script>
-                document.getElementById('categoryForm').addEventListener('submit', function(e) {
+            <script th:inline="javascript">
+                // 分类和商品数据
+                const allProducts = /*[[${products}]]*/ [];
+                const selectedProductId = /*[[${item?.productId}]]*/ '';
+                const isEdit = /*[[${isEdit}]]*/ false;
+                const itemId = /*[[${item?.itemId}]]*/ '';
+                
+                // 分类选择变化时更新商品下拉框
+                document.getElementById('categorySelect').addEventListener('change', function() {
+                    const categoryId = this.value;
+                    const productSelect = document.getElementById('productSelect');
+                    
+                    // 清空商品下拉框
+                    productSelect.innerHTML = '<option value="">请选择商品</option>';
+                    
+                    // 根据分类筛选商品
+                    const filteredProducts = categoryId 
+                        ? allProducts.filter(p => p.categoryId === categoryId)
+                        : allProducts;
+                    
+                    // 添加商品选项
+                    filteredProducts.forEach(prod => {
+                        const option = document.createElement('option');
+                        option.value = prod.productId;
+                        option.textContent = prod.name;
+                        if (prod.productId === selectedProductId) {
+                            option.selected = true;
+                        }
+                        productSelect.appendChild(option);
+                    });
+                });
+                
+                document.getElementById('itemForm').addEventListener('submit', function(e) {
                     e.preventDefault();
                     
                     const formData = new FormData(this);
                     const data = Object.fromEntries(formData.entries());
+                    // 移除categoryId，因为商品表已经包含了分类信息
+                    delete data.categoryId;
                     
-                    const isEdit = [[${isEdit}]] || false;
-                    const categoryId = [[${category?.categoryId}]] || '';
-                    
-                    const url = isEdit ? `/admin/categories/${categoryId}` : '/admin/categories';
+                    const url = isEdit ? `/admin/items/${itemId}` : '/admin/items';
                     const method = isEdit ? 'PUT' : 'POST';
                     
                     fetch(url, {
@@ -203,7 +258,7 @@
                       .then(result => {
                           if (result.code === 200) {
                               alert('保存成功');
-                              window.location.href = '/admin/categories';
+                              window.location.href = '/admin/items';
                           } else {
                               alert('保存失败：' + result.message);
                           }

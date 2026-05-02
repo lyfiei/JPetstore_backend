@@ -37,20 +37,35 @@ public class ItemServiceImpl implements ItemService {
     private final CategoryMapper categoryMapper;
 
     @Override
-    public Page<ItemVO> getItemList(int pageNum, int pageSize, String keyword, String productId) {
+    public Page<ItemVO> getItemList(int pageNum, int pageSize, String keyword, String productId, String categoryId) {
         Page<Item> page = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<Item> queryWrapper = new LambdaQueryWrapper<>();
+        
+        // 如果有分类ID，先找到该分类下的所有商品
+        if (StringUtils.hasText(categoryId)) {
+            LambdaQueryWrapper<Product> productQuery = new LambdaQueryWrapper<>();
+            productQuery.eq(Product::getCategoryId, categoryId);
+            List<Product> products = productMapper.selectList(productQuery);
+            if (!products.isEmpty()) {
+                List<String> productIds = products.stream().map(Product::getProductId).collect(Collectors.toList());
+                queryWrapper.in(Item::getProductId, productIds);
+            } else {
+                // 没有找到商品，返回空结果
+                queryWrapper.eq(Item::getItemId, "");
+            }
+        }
         
         if (StringUtils.hasText(productId)) {
             queryWrapper.eq(Item::getProductId, productId);
         }
         
         if (StringUtils.hasText(keyword)) {
-            queryWrapper.like(Item::getItemId, keyword)
-                       .or()
-                       .like(Item::getAttribute1, keyword)
-                       .or()
-                       .like(Item::getAttribute2, keyword);
+            queryWrapper.and(wrapper -> wrapper
+                    .like(Item::getItemId, keyword)
+                    .or()
+                    .like(Item::getAttribute1, keyword)
+                    .or()
+                    .like(Item::getAttribute2, keyword));
         }
         
         queryWrapper.orderByAsc(Item::getItemId);

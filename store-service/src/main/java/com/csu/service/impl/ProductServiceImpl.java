@@ -39,9 +39,10 @@ public class ProductServiceImpl implements ProductService {
         }
         
         if (StringUtils.hasText(keyword)) {
-            queryWrapper.like(Product::getName, keyword)
-                       .or()
-                       .like(Product::getDescription, keyword);
+            queryWrapper.and(wrapper -> wrapper
+                    .like(Product::getName, keyword)
+                    .or()
+                    .like(Product::getDescription, keyword));
         }
         
         queryWrapper.orderByAsc(Product::getProductId);

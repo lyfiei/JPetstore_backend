@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, content)">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:replace="${title}">JPetStore 管理后台</title>
+    <title>仪表盘 - JPetStore 管理后台</title>
     <style>
         * {
             margin: 0;
@@ -283,17 +283,29 @@
     <div class="container">
         <aside class="sidebar">
             <ul class="sidebar-menu">
-                <li><a th:href="@{/admin/dashboard}" th:classappend="${#request.requestURI == '/admin/dashboard'} ? 'active'">📊 仪表盘</a></li>
-                <li><a th:href="@{/admin/users}" th:classappend="${#request.requestURI.startsWith('/admin/users')} ? 'active'">👥 用户管理</a></li>
-                <li><a th:href="@{/admin/categories}" th:classappend="${#request.requestURI.startsWith('/admin/categories')} ? 'active'">📁 分类管理</a></li>
-                <li><a th:href="@{/admin/products}" th:classappend="${#request.requestURI.startsWith('/admin/products')} ? 'active'">📦 商品管理</a></li>
-                <li><a th:href="@{/admin/items}" th:classappend="${#request.requestURI.startsWith('/admin/items')} ? 'active'">🏷️ 货品管理</a></li>
-                <li><a th:href="@{/admin/orders}" th:classappend="${#request.requestURI.startsWith('/admin/orders')} ? 'active'">🛒 订单管理</a></li>
+                <li><a th:href="@{/admin/dashboard}" class="active">📊 仪表盘</a></li>
+                <li><a th:href="@{/admin/users}">👥 用户管理</a></li>
+                <li><a th:href="@{/admin/categories}">📁 分类管理</a></li>
+                <li><a th:href="@{/admin/products}">📦 商品管理</a></li>
+                <li><a th:href="@{/admin/items}">🏷️ 货品管理</a></li>
+                <li><a th:href="@{/admin/orders}">🛒 订单管理</a></li>
             </ul>
         </aside>
         
         <main class="main-content">
-            <div th:replace="${content}"></div>
+            <div class="card">
+                <div class="card-header">📊 数据概览</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>总订单数</h3>
+                        <div class="value" th:text="${totalOrders}">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>待处理订单</h3>
+                        <div class="value" th:text="${pendingOrders}">0</div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 </body>

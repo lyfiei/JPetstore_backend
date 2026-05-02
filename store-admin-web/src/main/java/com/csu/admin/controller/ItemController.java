@@ -4,6 +4,7 @@ package com.csu.admin.controller;
 import com.csu.common.result.Result;
 import com.csu.model.DTO.ItemRequestDTO;
 import com.csu.model.vo.ItemVO;
+import com.csu.service.CategoryService;
 import com.csu.service.ItemService;
 import com.csu.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -18,17 +19,21 @@ public class ItemController {
     
     private final ItemService itemService;
     private final ProductService productService;
+    private final CategoryService categoryService;
     
     @GetMapping
     public String itemList(@RequestParam(defaultValue = "1") int pageNum,
                           @RequestParam(defaultValue = "10") int pageSize,
                           @RequestParam(required = false) String keyword,
                           @RequestParam(required = false) String productId,
+                          @RequestParam(required = false) String categoryId,
                           Model model) {
-        model.addAttribute("itemPage", itemService.getItemList(pageNum, pageSize, keyword, productId));
-        model.addAttribute("products", productService.getProductsByCategory(null));
+        model.addAttribute("itemPage", itemService.getItemList(pageNum, pageSize, keyword, productId, categoryId));
+        model.addAttribute("products", productService.getProductsByCategory(categoryId));
+        model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("keyword", keyword);
         model.addAttribute("productId", productId);
+        model.addAttribute("categoryId", categoryId);
         return "admin/item/list";
     }
     
@@ -36,6 +41,8 @@ public class ItemController {
     public String newItemForm(Model model) {
         model.addAttribute("item", new ItemRequestDTO());
         model.addAttribute("products", productService.getProductsByCategory(null));
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("isEdit", false);
         return "admin/item/form";
     }
     
@@ -51,6 +58,7 @@ public class ItemController {
         ItemVO item = itemService.getItemDetail(itemId);
         model.addAttribute("item", item);
         model.addAttribute("products", productService.getProductsByCategory(null));
+        model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("isEdit", true);
         return "admin/item/form";
     }

@@ -30,6 +30,7 @@ public class CategoryController {
     @GetMapping("/new")
     public String newCategoryForm(Model model) {
         model.addAttribute("category", new CategoryRequestDTO());
+        model.addAttribute("isEdit", false);
         return "admin/category/form";
     }
     

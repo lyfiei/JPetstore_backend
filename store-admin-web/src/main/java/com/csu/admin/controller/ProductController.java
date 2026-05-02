@@ -36,6 +36,7 @@ public class ProductController {
     public String newProductForm(Model model) {
         model.addAttribute("product", new ProductRequestDTO());
         model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("isEdit", false);
         return "admin/product/form";
     }
     

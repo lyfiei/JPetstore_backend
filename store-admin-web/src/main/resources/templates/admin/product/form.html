@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${isEdit} ? '编辑分类' : '新增分类'">分类表单</title>
+    <title th:text="${isEdit} ? '编辑商品' : '新增商品'">商品表单</title>
     <style>
         * {
             margin: 0;
@@ -145,8 +145,8 @@
             <ul class="sidebar-menu">
                 <li><a th:href="@{/admin/dashboard}">📊 仪表盘</a></li>
                 <li><a th:href="@{/admin/users}">👥 用户管理</a></li>
-                <li><a th:href="@{/admin/categories}" class="active">📁 分类管理</a></li>
-                <li><a th:href="@{/admin/products}">📦 商品管理</a></li>
+                <li><a th:href="@{/admin/categories}">📁 分类管理</a></li>
+                <li><a th:href="@{/admin/products}" class="active">📦 商品管理</a></li>
                 <li><a th:href="@{/admin/items}">🏷️ 货品管理</a></li>
                 <li><a th:href="@{/admin/orders}">🛒 订单管理</a></li>
             </ul>
@@ -154,43 +154,51 @@
         
         <main class="main-content">
             <div class="card">
-                <div class="card-header" th:text="${isEdit} ? '编辑分类' : '新增分类'">分类表单</div>
+                <div class="card-header" th:text="${isEdit} ? '编辑商品' : '新增商品'">商品表单</div>
                 
-                <form id="categoryForm">
+                <form id="productForm">
                     <div class="form-group">
-                        <label>分类ID</label>
-                        <input type="text" name="categoryId" th:value="${category?.categoryId}" 
+                        <label>商品ID</label>
+                        <input type="text" name="productId" th:value="${product?.productId}" 
                                th:readonly="${isEdit}" placeholder="留空则自动生成">
                     </div>
-                    
                     <div class="form-group">
-                        <label>分类名称 *</label>
-                        <input type="text" name="name" th:value="${isEdit ? category?.categoryName : category?.name}" required>
+                        <label>商品名称 *</label>
+                        <input type="text" name="name" th:value="${product?.name}" required>
                     </div>
-                    
+                    <div class="form-group">
+                        <label>所属分类 *</label>
+                        <select name="categoryId" required>
+                            <option value="">请选择分类</option>
+                            <option th:each="cat : ${categories}" 
+                                    th:value="${cat.categoryId}" 
+                                    th:text="${cat.categoryName}"
+                                    th:selected="${product?.categoryId == cat.categoryId}"></option>
+                        </select>
+                    </div>
                     <div class="form-group">
                         <label>描述</label>
-                        <textarea name="description" rows="4" th:text="${category?.description}"></textarea>
+                        <textarea name="description" rows="4" th:text="${product?.description}"></textarea>
                     </div>
                     
                     <div style="display: flex; gap: 1rem;">
                         <button type="submit" class="btn btn-primary">保存</button>
-                        <a th:href="@{/admin/categories}" class="btn btn-warning">取消</a>
+                        <a th:href="@{/admin/products}" class="btn btn-warning">取消</a>
                     </div>
                 </form>
             </div>
             
             <script>
-                document.getElementById('categoryForm').addEventListener('submit', function(e) {
+                document.getElementById('productForm').addEventListener('submit', function(e) {
                     e.preventDefault();
                     
                     const formData = new FormData(this);
                     const data = Object.fromEntries(formData.entries());
                     
                     const isEdit = [[${isEdit}]] || false;
-                    const categoryId = [[${category?.categoryId}]] || '';
+                    const productId = [[${product?.productId}]] || '';
                     
-                    const url = isEdit ? `/admin/categories/${categoryId}` : '/admin/categories';
+                    const url = isEdit ? `/admin/products/${productId}` : '/admin/products';
                     const method = isEdit ? 'PUT' : 'POST';
                     
                     fetch(url, {
@@ -203,7 +211,7 @@
                       .then(result => {
                           if (result.code === 200) {
                               alert('保存成功');
-                              window.location.href = '/admin/categories';
+                              window.location.href = '/admin/products';
                           } else {
                               alert('保存失败：' + result.message);
                           }

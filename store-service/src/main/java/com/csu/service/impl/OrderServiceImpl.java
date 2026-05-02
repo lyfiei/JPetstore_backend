@@ -60,9 +60,10 @@ public class OrderServiceImpl implements OrderService {
         }
         
         if (StringUtils.hasText(keyword)) {
-            queryWrapper.like(Order::getOrderId, keyword)
-                       .or()
-                       .like(Order::getUserId, keyword);
+            queryWrapper.and(wrapper -> wrapper
+                    .like(Order::getOrderId, keyword)
+                    .or()
+                    .like(Order::getUserId, keyword));
         }
         
         queryWrapper.orderByDesc(Order::getOrderDate);

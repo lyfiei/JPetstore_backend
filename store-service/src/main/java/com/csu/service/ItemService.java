@@ -14,7 +14,7 @@ public interface ItemService {
     /**
      * 分页获取货品列表
      */
-    Page<ItemVO> getItemList(int pageNum, int pageSize, String keyword, String productId);
+    Page<ItemVO> getItemList(int pageNum, int pageSize, String keyword, String productId, String categoryId);
 
     /**
      * 获取货品详情

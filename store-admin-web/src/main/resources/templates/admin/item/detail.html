@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${isEdit} ? '编辑分类' : '新增分类'">分类表单</title>
+    <title>货品详情 - JPetStore 管理后台</title>
     <style>
         * {
             margin: 0;
@@ -133,6 +133,23 @@
             border-radius: 4px;
             font-size: 0.9rem;
         }
+        
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .badge-danger {
+            background: #fed7d7;
+            color: #742a2a;
+        }
     </style>
 </head>
 <body>
@@ -145,71 +162,49 @@
             <ul class="sidebar-menu">
                 <li><a th:href="@{/admin/dashboard}">📊 仪表盘</a></li>
                 <li><a th:href="@{/admin/users}">👥 用户管理</a></li>
-                <li><a th:href="@{/admin/categories}" class="active">📁 分类管理</a></li>
+                <li><a th:href="@{/admin/categories}">📁 分类管理</a></li>
                 <li><a th:href="@{/admin/products}">📦 商品管理</a></li>
-                <li><a th:href="@{/admin/items}">🏷️ 货品管理</a></li>
+                <li><a th:href="@{/admin/items}" class="active">🏷️ 货品管理</a></li>
                 <li><a th:href="@{/admin/orders}">🛒 订单管理</a></li>
             </ul>
         </aside>
         
         <main class="main-content">
             <div class="card">
-                <div class="card-header" th:text="${isEdit} ? '编辑分类' : '新增分类'">分类表单</div>
+                <div class="card-header">
+                    <span>货品详情</span>
+                    <a th:href="@{/admin/items}" class="btn btn-warning" style="float: right;">返回列表</a>
+                </div>
                 
-                <form id="categoryForm">
+                <div class="detail-info">
                     <div class="form-group">
-                        <label>分类ID</label>
-                        <input type="text" name="categoryId" th:value="${category?.categoryId}" 
-                               th:readonly="${isEdit}" placeholder="留空则自动生成">
+                        <label>货品ID</label>
+                        <input type="text" th:value="${item.itemId}" readonly>
                     </div>
-                    
                     <div class="form-group">
-                        <label>分类名称 *</label>
-                        <input type="text" name="name" th:value="${isEdit ? category?.categoryName : category?.name}" required>
+                        <label>所属商品</label>
+                        <input type="text" th:value="${item.productId}" readonly>
                     </div>
-                    
                     <div class="form-group">
-                        <label>描述</label>
-                        <textarea name="description" rows="4" th:text="${category?.description}"></textarea>
+                        <label>列表价格</label>
+                        <input type="text" th:value="${'¥' + item.listPrice}" readonly>
                     </div>
-                    
-                    <div style="display: flex; gap: 1rem;">
-                        <button type="submit" class="btn btn-primary">保存</button>
-                        <a th:href="@{/admin/categories}" class="btn btn-warning">取消</a>
+                    <div class="form-group">
+                        <label>成本价</label>
+                        <input type="text" th:value="${'¥' + item.unitCost}" readonly>
                     </div>
-                </form>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <span class="badge" th:classappend="${item.status == 'P'} ? 'badge-success' : 'badge-danger'"
+                              th:text="${item.status == 'P'} ? '有货' : '缺货'"></span>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <a th:href="@{'/admin/items/' + ${item.itemId} + '/edit'}" class="btn btn-primary">编辑</a>
+                    <a th:href="@{/admin/items}" class="btn btn-warning">返回</a>
+                </div>
             </div>
-            
-            <script>
-                document.getElementById('categoryForm').addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const formData = new FormData(this);
-                    const data = Object.fromEntries(formData.entries());
-                    
-                    const isEdit = [[${isEdit}]] || false;
-                    const categoryId = [[${category?.categoryId}]] || '';
-                    
-                    const url = isEdit ? `/admin/categories/${categoryId}` : '/admin/categories';
-                    const method = isEdit ? 'PUT' : 'POST';
-                    
-                    fetch(url, {
-                        method: method,
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    }).then(response => response.json())
-                      .then(result => {
-                          if (result.code === 200) {
-                              alert('保存成功');
-                              window.location.href = '/admin/categories';
-                          } else {
-                              alert('保存失败：' + result.message);
-                          }
-                      });
-                });
-            </script>
         </main>
     </div>
 </body>
